@@ -1,0 +1,48 @@
+# Automatically normalize text files
+* text=auto
+
+# Source code
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.json text
+*.md text
+*.xml text
+*.yml text
+*.yaml text
+*.gradle text
+*.properties text
+
+# Shell scripts
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# Android binaries
+*.apk binary
+*.aab binary
+*.keystore binary
+
+# iOS binaries
+*.ipa binary
+
+# Archives
+*.zip binary
+*.jar binary

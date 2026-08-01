@@ -5,17 +5,29 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AppStackParamList } from "../../navigation/AppStack";
 
-const ReportIssueCard = () => {
+type NavigationProp =
+  NativeStackNavigationProp<AppStackParamList>;
+
+export default function ReportIssueCard() {
+  const navigation = useNavigation<NavigationProp>();
+
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.8}
+      onPress={() => navigation.navigate("ReportIssueScreen")}
+    >
       <View style={styles.left}>
         <View style={styles.iconBox}>
           <Text style={styles.icon}>💬</Text>
         </View>
 
         <View>
-          <Text style={styles.title}>Report an issue</Text>
+          <Text style={styles.title}>Report an Issue</Text>
           <Text style={styles.subtitle}>
             Complaints and support
           </Text>
@@ -25,20 +37,17 @@ const ReportIssueCard = () => {
       <Text style={styles.arrow}>›</Text>
     </TouchableOpacity>
   );
-};
-
-export default ReportIssueCard;
+}
 
 const styles = StyleSheet.create({
   card: {
     marginTop: 8,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     borderRadius: 18,
     padding: 18,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-
     elevation: 2,
   },
 
@@ -68,9 +77,9 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    color: "#9CA3AF",
     marginTop: 2,
     fontSize: 13,
+    color: "#9CA3AF",
   },
 
   arrow: {

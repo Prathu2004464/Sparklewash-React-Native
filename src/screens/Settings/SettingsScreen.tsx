@@ -68,6 +68,7 @@ export default function SettingsScreen() {
           icon="bell-outline"
           title="Notifications"
           subtitle="Push notifications & reminders"
+          onPress={() => navigation.navigate("NotificationScreen")}
         />
 
         <SettingsItem

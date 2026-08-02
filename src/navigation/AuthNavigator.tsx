@@ -1,87 +1,54 @@
-import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import BottomTabNavigator from "./BottomTabNavigator";
-import ProfileScreen from "../screens/Profile/ProfileScreen";
-import SavedAddressesScreen from "../screens/Address/SavedAddressesScreen";
-import PaymentMethodsScreen from "../screens/Payment/PaymentMethodsScreen";
-import PaymentDetailsScreen from "../screens/Payment/PaymentDetailsScreen";
-import EditCardScreen from "../screens/Payment/EditCardScreen";
-import NotificationScreen from "../screens/Notifications/NotificationScreen";
-import ReportIssueScreen from "../screens/Complaint/ReportIssueScreen";
-import IssueSubmittedScreen from "../screens/Complaint/IssueSubmittedScreen";
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
+import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
+import OTPVerificationScreen from '../screens/Auth/OTPVerificationScreen';
+import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen';
 
-export type AppStackParamList = {
-  MainTabs: undefined;
-  Profile: undefined;
-  SavedAddressesScreen: undefined;
-  PaymentMethodsScreen: undefined;
-  PaymentDetailsScreen: undefined;
-  AddCardScreen: undefined;
-  EditCardScreen: undefined;
-  AddUPIScreen: undefined;
-  NotificationScreen: undefined;
-  ReportIssueScreen: undefined;
-  IssueSubmittedScreen: undefined;
+export type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+  OTPVerification: undefined;
+  ResetPassword: undefined;
 };
 
-const Stack = createStackNavigator<AppStackParamList>();
+const Stack = createNativeStackNavigator<AuthStackParamList>();
 
-export default function AppStack() {
+export default function AuthNavigator() {
   return (
     <Stack.Navigator
+      initialRouteName="Login"
       screenOptions={{
         headerShown: false,
       }}
     >
       <Stack.Screen
-        name="MainTabs"
-        component={BottomTabNavigator}
+        name="Login"
+        component={LoginScreen}
       />
 
       <Stack.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="Register"
+        component={RegisterScreen}
       />
 
       <Stack.Screen
-        name="SavedAddressesScreen"
-        component={SavedAddressesScreen}
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
       />
 
       <Stack.Screen
-       name="PaymentMethodsScreen"
-       component={PaymentMethodsScreen}
-        
-              />
-
-      <Stack.Screen
-        name="PaymentDetailsScreen"
-        component={PaymentDetailsScreen}
+        name="OTPVerification"
+        component={OTPVerificationScreen}
       />
 
       <Stack.Screen
-        name="EditCardScreen"
-        component={EditCardScreen}
+        name="ResetPassword"
+        component={ResetPasswordScreen}
       />
-
-      <Stack.Screen
-              name="NotificationScreen"
-              component={NotificationScreen}
-      />
-
-      <Stack.Screen
-          name="ReportIssueScreen"
-          component={ReportIssueScreen}
-      />
-
-      <Stack.Screen
-        name="IssueSubmittedScreen"
-        component={IssueSubmittedScreen}
-      />
-
-
     </Stack.Navigator>
-    
   );
 }

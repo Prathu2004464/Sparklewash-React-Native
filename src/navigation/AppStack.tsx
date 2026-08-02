@@ -10,6 +10,12 @@ import EditCardScreen from "../screens/Payment/EditCardScreen";
 import NotificationScreen from "../screens/Notifications/NotificationScreen";
 import ReportIssueScreen from "../screens/Complaint/ReportIssueScreen";
 import IssueSubmittedScreen from "../screens/Complaint/IssueSubmittedScreen";
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
+import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
+import OTPVerificationScreen from '../screens/Auth/OTPVerificationScreen';
+import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen';
+
 
 
 
@@ -25,6 +31,11 @@ export type AppStackParamList = {
   NotificationScreen: undefined;
   ReportIssueScreen: undefined;
   IssueSubmittedScreen: undefined;
+  Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+  OTPVerification: undefined;
+  ResetPassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -75,6 +86,31 @@ export default function AppStack() {
       <Stack.Screen
         name="IssueSubmittedScreen"
         component={IssueSubmittedScreen}
+      />
+
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+      />
+
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+      />
+
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+      />
+
+      <Stack.Screen
+        name="OTPVerification"
+        component={OTPVerificationScreen}
+      />
+
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPasswordScreen}
       />
     </Stack.Navigator>
   );

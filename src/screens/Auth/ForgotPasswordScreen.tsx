@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -15,6 +15,22 @@ import AuthInput from '../../components/auth/AuthInput';
 import PrimaryButton from '../../components/auth/PrimaryButton';
 
 const ForgotPasswordScreen = ({ navigation }: any) => {
+
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  const handleSendOTP = () => {
+  setPhoneError("");
+
+  if (!phone.trim()) {
+    setPhoneError("Phone number is required");
+    return;
+  }
+
+  // API call will go here later
+
+  navigation.navigate("OTPVerification");
+};
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -38,23 +54,22 @@ const ForgotPasswordScreen = ({ navigation }: any) => {
           </Text>
 
           <Text style={styles.subtitle}>
-            Enter your registered email address and we'll send you an OTP to reset your password.
+            Enter your registered phone number and we'll send you an OTP to reset your password.
           </Text>
-
           <AuthInput
-            label="Email Address"
-            icon="mail-outline"
-            placeholder="Enter your email"
-            keyboardType="email-address"
+            label="Phone Number"
+            icon="phone-outline"
+            placeholder="Enter your mobile number"
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
+            error={phoneError}
           />
+          
 
           <PrimaryButton
-          title="Send OTP"
-          onPress={() =>
-            navigation.navigate('OTPVerification', {
-              type: 'forgot',
-            })
-          }
+            title="Send OTP"
+            onPress={handleSendOTP}
           />
           <Text
             style={styles.back}

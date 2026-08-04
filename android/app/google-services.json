@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "769432757984",
+    "project_id": "sparklewash-project",
+    "storage_bucket": "sparklewash-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:769432757984:android:2a8236b055af336eaf9285",
+        "android_client_info": {
+          "package_name": "com.salon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0wO9WCf5Xv8Is43ZvMlGfAqP_EQQT3nE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

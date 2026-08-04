@@ -1,42 +1,89 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/RootNavigator';
+import React, { useEffect, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  Animated,
+  StatusBar,
+} from "react-native";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
+import Video from "react-native-video";
 
-export default function SplashScreen({ navigation }: Props) {
+const SplashScreen = ({ navigation }: any) => {
+
+  const opacity = useRef(new Animated.Value(1)).current;
+
   useEffect(() => {
+
     const timer = setTimeout(() => {
-      navigation.replace('Auth');
-    }, 2000);
+
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }).start(() => {
+
+        navigation.replace("Auth");
+
+      });
+
+    }, 3800);
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>🚗 SparkleWash</Text>
-      <Text style={styles.subtitle}>Smart Car Wash Management</Text>
-    </View>
+
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          opacity,
+        },
+      ]}>
+
+      <StatusBar
+        hidden
+      />
+
+      <Video
+        source={require("../../assets/videos/landing_animation.mp4")}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+        repeat={false}
+        paused={false}
+        onEnd={() => {
+
+    setTimeout(() => {
+
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }).start(() => {
+
+        navigation.replace("Auth");
+
+      });
+
+    }, 800);
+
+  }}
+/>
+
+    </Animated.View>
+
   );
-}
+
+};
+
+export default SplashScreen;
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor:"#F8FAFC",
   },
-  logo: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1E88E5',
-  },
-  subtitle: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#666',
-  },
+
 });

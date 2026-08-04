@@ -1,4 +1,7 @@
 import React, { useRef, useState } from 'react';
+import { Alert } from 'react-native';
+import { verifyOTP } from '../../services/phoneAuth';
+import axios from 'axios';
 import {
   SafeAreaView,
   StyleSheet,
@@ -13,10 +16,18 @@ import {
 
 import MaterialIcons from '@react-native-vector-icons/material-design-icons';
 import PrimaryButton from '../../components/auth/PrimaryButton';
+import API_BASE_URL from '../../config/api';
 
 const OTPVerificationScreen = ({ navigation, route }: any) => {
-  const { type } = route.params;
+  const {
+  type,
+  fullName,
+  email,
+  phone,
+  password,
+  } = route.params;
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [loading, setLoading] = useState(false);
 
   const inputs = useRef<Array<TextInput | null>>([]);
 
@@ -30,13 +41,61 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
     }
   };
 
-  const handleVerifyOTP = () => {
-  if (type === 'register') {
-    navigation.navigate('Login');
-  } else {
-    navigation.navigate('ResetPassword');
+  const handleVerifyOTP = async () => {
+
+  const code = otp.join("");
+
+  if (code.length !== 6) {
+    Alert.alert("Invalid OTP", "Please enter all 6 digits.");
+    return;
   }
-};
+
+  try {
+
+    setLoading(true);
+
+    const result = await verifyOTP(code);
+
+    if (!result.success) {
+      Alert.alert("Verification Failed", result.message);
+      return;
+    }
+
+    // Firebase Verified Successfully
+
+    const response = await axios.post(
+      `${API_BASE_URL}/auth/register`,
+      {
+        name: fullName,
+        email,
+        phone,
+        password,
+      }
+    );
+
+    Alert.alert(
+      "Success",
+      "Account created successfully."
+    );
+
+    navigation.replace("Login");
+
+  } catch (error: any) {
+
+    console.log(error);
+
+    Alert.alert(
+      "Error",
+      error.response?.data?.message || error.message
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -61,7 +120,7 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
           </Text>
 
           <Text style={styles.subtitle}>
-            Enter the 6-digit verification code sent to your registered email.
+            Enter the 6-digit verification code sent to your registered phone number.
           </Text>
 
           <View style={styles.otpContainer}>
@@ -91,9 +150,9 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
           </TouchableOpacity>
 
           <PrimaryButton
-              title="Verify OTP"
+              title={loading ? "Verifying..." : "Verify OTP"}
               onPress={handleVerifyOTP}
-            />
+          />
 
         </ScrollView>
       </KeyboardAvoidingView>

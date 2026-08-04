@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Image } from 'react-native';
+import { saveToken } from '../../services/AsyncStorageServices';
 import {
   SafeAreaView,
   View,
@@ -25,6 +26,8 @@ const LoginScreen = ({ navigation }: any) => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
+  
+
   const handleLogin = () => {
   setEmailError('');
   setPasswordError('');
@@ -48,6 +51,8 @@ const LoginScreen = ({ navigation }: any) => {
   // Temporary navigation while backend is not connected
   navigation.replace('App');
 };
+
+
 
   return (
     <SafeAreaView style={styles.container}>

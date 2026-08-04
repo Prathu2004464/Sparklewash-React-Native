@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Image } from 'react-native';
 import { Alert } from 'react-native';
+import { sendOTP } from "../../services/phoneAuth";
 import {
   SafeAreaView,
   View,
@@ -32,8 +33,9 @@ const RegisterScreen = ({ navigation }: any) => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [termsError, setTermsError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
   setFullNameError('');
   setEmailError('');
   setPhoneError('');
@@ -80,9 +82,37 @@ const RegisterScreen = ({ navigation }: any) => {
 
   if (!valid) return;
 
- navigation.navigate('OTPVerification', {
-  type: 'register',
-});
+  // Validate Indian mobile number
+  if (!/^[6-9]\d{9}$/.test(phone)) {
+    setPhoneError("Enter a valid 10-digit mobile number");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const fullPhone = `+91${phone}`;
+
+    const result = await sendOTP(fullPhone);
+
+    if (!result.success) {
+      Alert.alert("OTP Failed", result.message);
+      return;
+    }
+
+    navigation.navigate("OTPVerification", {
+      type: "register",
+      fullName,
+      email,
+      phone,
+      password,
+    });
+
+  } catch (error: any) {
+    Alert.alert("Error", error.message);
+  } finally {
+    setLoading(false);
+  }
 };
   return (
     <SafeAreaView style={styles.container}>
@@ -179,7 +209,7 @@ const RegisterScreen = ({ navigation }: any) => {
           </TouchableOpacity>
 
           <PrimaryButton
-            title="Create Account"
+            title={loading ? "Sending OTP..." : "Create Account"}
             onPress={handleRegister}
           />
 

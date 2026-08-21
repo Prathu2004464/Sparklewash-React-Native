@@ -1,14 +1,22 @@
 
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { Alert } from "react-native";
+import { removeToken } from "../../services/AsyncStorageService";
+import API from '../../services/api';
 import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-} from "react-native";
+  ActivityIndicator,
+} from 'react-native';
+
+import {
+  useFocusEffect,
+} from '@react-navigation/native';
 
 import SettingsItem from "../../components/settings/SettingItem";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import MaterialIcons from '@react-native-vector-icons/material-design-icons';
 import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import type { AppStackParamList } from "../../navigation/AppStack";
@@ -28,8 +36,82 @@ interface SettingsItemProps {
 
 export default function SettingsScreen() {
 
+  
+
   const navigation =
   useNavigation<NativeStackNavigationProp<AppStackParamList>>();
+
+  const [profile, setProfile] = useState<any>(null);
+  const [notifications, setNotifications] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const handleLogout = () => {
+  Alert.alert(
+    'Logout',
+    'Are you sure you want to logout?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await removeToken();
+
+            Alert.alert(
+              'Logged out',
+              'You have been logged out successfully.'
+            );
+          } catch (error) {
+            console.log('Logout Error:', error);
+            Alert.alert('Error', 'Failed to logout.');
+          }
+        },
+      },
+    ]
+  );
+};
+
+      useFocusEffect(
+        React.useCallback(() => {
+          loadSettings();
+        }, [])
+      );
+
+    const loadSettings = async () => {
+      try {
+        setLoading(true);
+
+        const [profileRes, notificationRes] = await Promise.all([
+          API.get('/customer/profile'),
+          API.get('/customer/notification-preferences'),
+        ]);
+
+        setProfile(profileRes.data.profile);
+        setNotifications(notificationRes.data.preferences);
+        console.log('SETTINGS PROFILE:', profileRes.data.profile);
+        console.log('SETTINGS NOTIFICATIONS:', notificationRes.data.preferences);
+      } catch (error) {
+        console.log('SETTINGS LOAD ERROR:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (loading) {
+      return (
+        <SafeAreaView style={styles.container}>
+          <ActivityIndicator
+            size="large"
+            color="#1565C0"
+            style={{ flex: 1 }}
+          />
+        </SafeAreaView>
+      );
+    }
 
 
   return (
@@ -48,34 +130,41 @@ export default function SettingsScreen() {
         />
 
         <SettingsItem
-          icon="map-marker"
-          title="Saved Addresses"
-          subtitle="Manage pickup locations"
-          onPress={() => navigation.navigate("SavedAddressesScreen")}
-        />
+            icon="map-marker"
+            title="Saved Address"
+            subtitle={
+              profile?.address
+                ? profile.address
+                : 'No address saved'
+            }
+            onPress={() => navigation.navigate('SavedAddressesScreen')}
+          />
 
         <SettingsItem
           icon="credit-card-outline"
           title="Payment Methods"
-          subtitle="Manage your saved payment methods"
-          onPress={() => {
-            console.log(navigation.getState());
-            navigation.navigate("PaymentMethodsScreen");
-          }}
+          subtitle="No payment method added"
+          onPress={() =>
+            navigation.navigate('PaymentMethodsScreen')
+          }
         />
 
         <SettingsItem
-          icon="bell-outline"
-          title="Notifications"
-          subtitle="Push notifications & reminders"
-          onPress={() => navigation.navigate("NotificationScreen")}
-        />
-
-        <SettingsItem
-          icon="help-circle-outline"
-          title="Help & Support"
-          subtitle="FAQs and customer support"
-        />
+            icon="bell-outline"
+            title="Notifications"
+            subtitle={
+              notifications
+                ? `Reminders ${
+                    notifications.wash_reminders ? 'ON' : 'OFF'
+                  } • Alerts ${
+                    notifications.subscription_alerts ? 'ON' : 'OFF'
+                  }`
+                : 'Configure notifications'
+            }
+            onPress={() =>
+              navigation.navigate('NotificationScreen')
+            }
+            />
 
         <SettingsItem
           icon="shield-account-outline"
@@ -87,8 +176,9 @@ export default function SettingsScreen() {
           icon="logout"
           title="Logout"
           danger
+          onPress={handleLogout}
         />
-      </ScrollView>
+        </ScrollView>
     </SafeAreaView>
   );
 }

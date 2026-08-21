@@ -6,6 +6,10 @@ import RegisterScreen from '../screens/Auth/RegisterScreen';
 import ForgotPasswordScreen from '../screens/Auth/ForgotPasswordScreen';
 import OTPVerificationScreen from '../screens/Auth/OTPVerificationScreen';
 import ResetPasswordScreen from '../screens/Auth/ResetPasswordScreen';
+import AddVehicleScreen from "../screens/Vehicles/AddVehicleScreen";
+import ReviewBookingScreen from '../screens/Booking/ReviewBookingScreen';
+import BookingSuccessScreen from '../screens/Booking/BookingSuccessScreen';
+import SuccessAnimationScreen from '../screens/Auth/SuccessAnimationScreen';
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -13,6 +17,20 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
   OTPVerification: undefined;
   ResetPassword: undefined;
+  AddVehicleScreen: undefined;
+  SuccessAnimationScreen: undefined;
+
+  ReviewBookingScreen: {
+    vehicle: any;
+    package: any;
+    customer: any;
+  };
+
+  BookingSuccessScreen: {
+    vehicle: any;
+    package: any;
+    customer: any;
+  };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
@@ -36,6 +54,12 @@ export default function AuthNavigator() {
       />
 
       <Stack.Screen
+              name="SuccessAnimationScreen"
+              component={SuccessAnimationScreen}
+              options={{ headerShown: false }}
+            />
+
+      <Stack.Screen
         name="ForgotPassword"
         component={ForgotPasswordScreen}
       />
@@ -49,6 +73,21 @@ export default function AuthNavigator() {
         name="ResetPassword"
         component={ResetPasswordScreen}
       />
+
+      <Stack.Screen
+        name="AddVehicleScreen"
+        component={AddVehicleScreen}
+      />
+
+        <Stack.Screen
+        name="ReviewBookingScreen"
+        component={ReviewBookingScreen}
+      />
+        <Stack.Screen
+        name="BookingSuccessScreen"
+        component={BookingSuccessScreen}
+      />
+      
     </Stack.Navigator>
   );
 }

@@ -1,89 +1,82 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 import {
   View,
-  StyleSheet,
   Animated,
-  StatusBar,
-} from "react-native";
+  StyleSheet,
+} from 'react-native';
+import {
+  useNavigation,
+  StackActions,
+} from '@react-navigation/native';
 
-import Video from "react-native-video";
+import { getToken } from '../../services/AsyncStorageService';
 
-const SplashScreen = ({ navigation }: any) => {
-
-  const opacity = useRef(new Animated.Value(1)).current;
+const SplashScreen = () => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
 
-    const timer = setTimeout(() => {
+    checkLogin();
 
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(() => {
-
-        navigation.replace("Auth");
-
-      });
-
-    }, 3800);
-
-    return () => clearTimeout(timer);
-
+    return () => {
+      // Cleanup handled by the timeout inside checkLogin
+    };
   }, []);
 
+  const checkLogin = async () => {
+    try {
+      const token = await getToken();
+
+      setTimeout(() => {
+        if (token) {
+          navigation.dispatch(
+            StackActions.replace('App')
+          );
+        } else {
+          navigation.dispatch(
+            StackActions.replace('Auth')
+          );
+        }
+      }, 2500);
+
+    } catch (error) {
+      console.log('SPLASH AUTH CHECK ERROR:', error);
+
+      navigation.dispatch(
+        StackActions.replace('Auth')
+      );
+    }
+  };
+
   return (
-
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          opacity,
-        },
-      ]}>
-
-      <StatusBar
-        hidden
+    <View style={styles.container}>
+      <Animated.Image
+        source={require('../../assets/images/sparklewash_logo.png')}
+        style={[styles.logo, { opacity }]}
+        resizeMode="contain"
       />
-
-      <Video
-        source={require("../../assets/videos/landing_animation.mp4")}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-        repeat={false}
-        paused={false}
-        onEnd={() => {
-
-    setTimeout(() => {
-
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 400,
-        useNativeDriver: true,
-      }).start(() => {
-
-        navigation.replace("Auth");
-
-      });
-
-    }, 800);
-
-  }}
-/>
-
-    </Animated.View>
-
+    </View>
   );
-
 };
 
-export default SplashScreen;
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
-    backgroundColor:"#F8FAFC",
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
+  logo: {
+    width: 180,
+    height: 180,
+  },
 });
+
+export default SplashScreen;

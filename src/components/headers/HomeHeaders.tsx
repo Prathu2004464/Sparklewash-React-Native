@@ -1,12 +1,16 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const HomeHeader = () => {
+type Props = {
+  name?: string;
+};
+
+export default function HomeHeader({ name = 'Customer' }: Props) {
   return (
     <View style={styles.container}>
       <View>
         <Text style={styles.greeting}>Good Morning</Text>
-        <Text style={styles.name}>Prathamesh</Text>
+        <Text style={styles.name}>{name}</Text>
       </View>
 
       <View style={styles.avatar}>
@@ -16,7 +20,6 @@ const HomeHeader = () => {
   );
 };
 
-export default HomeHeader;
 
 const styles = StyleSheet.create({
   container: {

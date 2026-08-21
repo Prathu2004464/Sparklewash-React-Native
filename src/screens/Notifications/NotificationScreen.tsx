@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -10,77 +12,88 @@ import {
 import MaterialIcons from "@react-native-vector-icons/material-design-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-import NotificationCard from "../../components/notification/NotificationCard";
-import EmptyNotification from "../../components/notification/EmptyNotification";
 import { AppStackParamList } from "../../navigation/AppStack";
+import API from "../../services/api";
 
-type Notification = {
-  id: number;
-  icon: string;
-  iconColor: string;
-  title: string;
-  message: string;
-  time: string;
-  unread: boolean;
-};
 
 export default function NotificationScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<AppStackParamList>>();
 
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      icon: "check-circle-outline",
-      iconColor: "#16A34A",
-      title: "Booking Confirmed",
-      message: "Your Premium Wash has been confirmed.",
-      time: "10 min ago",
-      unread: true,
-    },
-    {
-      id: 2,
-      icon: "credit-card-outline",
-      iconColor: "#7C3AED",
-      title: "Payment Successful",
-      message: "₹599 payment completed successfully.",
-      time: "25 min ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      icon: "star-outline",
-      iconColor: "#F59E0B",
-      title: "Subscription Reminder",
-      message: "Your subscription expires tomorrow.",
-      time: "Yesterday",
-      unread: false,
-    },
-    {
-      id: 4,
-      icon: "gift-outline",
-      iconColor: "#EA580C",
-      title: "Special Offer",
-      message: "Flat 20% OFF on Ceramic Wash.",
-      time: "2 days ago",
-      unread: false,
-    },
-  ]);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
-  const markAllRead = () => {
-    setNotifications((prev) =>
-      prev.map((item) => ({
-        ...item,
-        unread: false,
-      }))
+    const [preferences, setPreferences] = useState({
+      wash_reminders: true,
+      subscription_alerts: true,
+      payment_updates: true,
+      promotional_offers: false,
+    });
+
+    useEffect(() => {
+  loadPreferences();
+}, []);
+
+const loadPreferences = async () => {
+  try {
+    setLoading(true);
+
+    const response = await API.get(
+      '/customer/notification-preferences'
     );
+
+    setPreferences(response.data.preferences);
+  } catch (error) {
+    console.log('NOTIFICATION LOAD ERROR:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+const togglePreference = async (
+  key: keyof typeof preferences
+) => {
+  const updated = {
+    ...preferences,
+    [key]: !preferences[key],
   };
 
-  const clearAll = () => {
-    setNotifications([]);
-  };
+  setPreferences(updated);
 
+  try {
+    setSaving(true);
+
+    await API.put(
+      '/customer/notification-preferences',
+      updated
+    );
+  } catch (error: any) {
+  console.log(
+    'NOTIFICATION SAVE ERROR:',
+    error?.response?.data || error.message
+  );
+
+  setPreferences(preferences);
+
+  Alert.alert(
+    'Error',
+    'Failed to update notification preferences.'
+  );
+} finally {
+    setSaving(false);
+  }
+};
+
+if (loading) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <ActivityIndicator
+        size="large"
+        color="#1565C0"
+        style={{ flex: 1 }}
+      />
+    </SafeAreaView>
+  );
+}
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -105,68 +118,112 @@ export default function NotificationScreen() {
 
       {/* Buttons */}
 
-      {notifications.length > 0 && (
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={markAllRead}
-          >
-            <MaterialIcons
-              name="check-circle-outline"
-              size={18}
-              color="#2563EB"
-            />
+     <ScrollView
+  contentContainerStyle={styles.content}
+  showsVerticalScrollIndicator={false}>
 
-            <Text style={styles.actionText}>
-              Mark All Read
-            </Text>
-          </TouchableOpacity>
+  <Text style={styles.subtitle}>
+    Manage how SparkleWash keeps you updated.
+  </Text>
 
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={clearAll}
-          >
-            <MaterialIcons
-              name="delete-outline"
-              size={18}
-              color="#DC2626"
-            />
+  <View style={styles.card}>
 
-            <Text
-              style={[
-                styles.actionText,
-                { color: "#DC2626" },
-              ]}
-            >
-              Clear All
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+    <NotificationToggle
+      icon="bell-ring-outline"
+      title="Wash Reminders"
+      subtitle="Get reminders before your scheduled wash."
+      enabled={preferences.wash_reminders}
+      onPress={() =>
+        togglePreference('wash_reminders')
+      }
+    />
 
-      {/* Notifications */}
+    <NotificationToggle
+      icon="calendar-alert-outline"
+      title="Subscription Alerts"
+      subtitle="Renewal and expiry reminders."
+      enabled={preferences.subscription_alerts}
+      onPress={() =>
+        togglePreference('subscription_alerts')
+      }
+    />
 
-      {notifications.length === 0 ? (
-        <EmptyNotification />
-      ) : (
-        <ScrollView
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
-        >
-          {notifications.map((item) => (
-            <NotificationCard
-              key={item.id}
-              icon={item.icon}
-              iconColor={item.iconColor}
-              title={item.title}
-              message={item.message}
-              time={item.time}
-              unread={item.unread}
-            />
-          ))}
-        </ScrollView>
-      )}
+    <NotificationToggle
+      icon="credit-card-outline"
+      title="Payment Updates"
+      subtitle="Payment success and invoice alerts."
+      enabled={preferences.payment_updates}
+      onPress={() =>
+        togglePreference('payment_updates')
+      }
+    />
+
+    <NotificationToggle
+      icon="tag-outline"
+      title="Promotional Offers"
+      subtitle="Discounts and special offers."
+      enabled={preferences.promotional_offers}
+      onPress={() =>
+        togglePreference('promotional_offers')
+      }
+    />
+  </View>
+
+  {saving && (
+    <View style={styles.savingBox}>
+      <ActivityIndicator size="small" color="#1565C0" />
+      <Text style={styles.savingText}>
+        Saving preferences...
+      </Text>
+    </View>
+  )}
+</ScrollView>
     </SafeAreaView>
+  );
+}
+
+function NotificationToggle({
+  icon,
+  title,
+  subtitle,
+  enabled,
+  onPress,
+}: {
+  icon: string;
+  title: string;
+  subtitle: string;
+  enabled: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      style={styles.item}
+      activeOpacity={0.85}
+      onPress={onPress}>
+
+      <View style={styles.iconBox}>
+        <MaterialIcons
+          name={icon as any}
+          size={24}
+          color="#1565C0"
+        />
+      </View>
+
+      <View style={{ flex: 1, marginLeft: 14 }}>
+        <Text style={styles.itemTitle}>{title}</Text>
+        <Text style={styles.itemSubtitle}>{subtitle}</Text>
+      </View>
+
+      <MaterialIcons
+        name={
+          enabled
+            ? ('toggle-switch' as any)
+            : ('toggle-switch-off-outline' as any)
+        }
+        size={42}
+        color={enabled ? '#16A34A' : '#9CA3AF'}
+      />
+    </TouchableOpacity>
   );
 }
 
@@ -218,4 +275,74 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 30,
   },
+
+  subtitle: {
+  marginBottom: 24,
+  fontSize: 15,
+  color: '#6B7280',
+  lineHeight: 22,
+},
+
+card: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 22,
+  paddingVertical: 6,
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+  shadowColor: '#000',
+  shadowOpacity: 0.04,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 3 },
+  elevation: 2,
+},
+
+item: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 16,
+  paddingVertical: 18,
+  borderBottomWidth: 1,
+  borderBottomColor: '#F3F4F6',
+},
+
+iconBox: {
+  width: 48,
+  height: 48,
+  borderRadius: 14,
+  backgroundColor: '#E8F1FD',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+itemTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  color: '#111827',
+},
+
+itemSubtitle: {
+  marginTop: 4,
+  fontSize: 13,
+  color: '#6B7280',
+  lineHeight: 18,
+},
+
+savingBox: {
+  marginTop: 20,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#FFFFFF',
+  borderRadius: 14,
+  paddingVertical: 12,
+  borderWidth: 1,
+  borderColor: '#E5E7EB',
+},
+
+savingText: {
+  marginLeft: 10,
+  fontSize: 14,
+  color: '#1565C0',
+  fontWeight: '600',
+},
 });

@@ -1,5 +1,10 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import MaterialCommunityIcons from '@react-native-vector-icons/material-design-icons';
 
 interface VehicleCardProps {
@@ -8,6 +13,7 @@ interface VehicleCardProps {
   plan: string;
   daysLeft: number;
   active?: boolean;
+  onPress?: () => void;
 }
 
 const VehicleCard = ({
@@ -16,9 +22,14 @@ const VehicleCard = ({
   plan,
   daysLeft,
   active = true,
+  onPress,
 }: VehicleCardProps) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.85}
+          onPress={onPress}
+        >
       {/* Top Row */}
       <View style={styles.topRow}>
         <View style={styles.left}>
@@ -73,7 +84,7 @@ const VehicleCard = ({
           ]}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

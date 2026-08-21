@@ -1,17 +1,25 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function DashboardStats() {
+type Props = {
+  activePlans?: number;
+  pendingDue?: number;
+};
+
+export default function DashboardStats({
+  activePlans = 0,
+  pendingDue = 0,
+}: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>Active Plans</Text>
-        <Text style={styles.value}>2</Text>
+        <Text style={styles.value}>{activePlans}</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.title}>Pending Due</Text>
-        <Text style={styles.value}>₹499</Text>
+        <Text style={styles.value}>{pendingDue}</Text>
       </View>
     </View>
   );

@@ -1,40 +1,40 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-
-import SplashScreen from '../screens/Splash/SplashScreen';
 import AuthNavigator from './AuthNavigator';
 import AppStack from './AppStack';
+import SplashScreen from '../screens/Splash/SplashScreen';
 
-export type RootStackParamList = {
-  Splash: undefined;
-  Auth: undefined;
-  App: undefined;
-};
-
-const Stack = createStackNavigator<RootStackParamList>();
+import { getToken } from '../services/AsyncStorageService';
 
 export default function RootNavigator() {
-  return (
-    <Stack.Navigator
-      initialRouteName="Splash"
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen
-        name="Splash"
-        component={SplashScreen}
-      />
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-      <Stack.Screen
-        name="Auth"
-        component={AuthNavigator}
-      />
+  const checkAuth = async () => {
+    try {
+      const token = await getToken();
+      setIsLoggedIn(!!token);
+    } catch (error) {
+      console.log('AUTH CHECK ERROR:', error);
+      setIsLoggedIn(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      <Stack.Screen
-        name="App"
-        component={AppStack}
-      />
-    </Stack.Navigator>
-  );
+  useEffect(() => {
+    checkAuth();
+
+    // Re-check token periodically so logout updates immediately
+    const interval = setInterval(checkAuth, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
+  return isLoggedIn ? <AppStack /> : <AuthNavigator />;
 }

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { verifyOTP } from '../../services/phoneAuth';
 import axios from 'axios';
+import { saveToken } from '../../services/AsyncStorageService';
 import {
   SafeAreaView,
   StyleSheet,
@@ -63,22 +64,23 @@ const OTPVerificationScreen = ({ navigation, route }: any) => {
 
     // Firebase Verified Successfully
 
-    const response = await axios.post(
-      `${API_BASE_URL}/auth/register`,
-      {
-        name: fullName,
-        email,
-        phone,
-        password,
-      }
-    );
+    // Firebase Verified Successfully
 
-    Alert.alert(
-      "Success",
-      "Account created successfully."
-    );
+const response = await axios.post(
+  `${API_BASE_URL}/auth/register`,
+  {
+    name: fullName,
+    email,
+    phone,
+    password,
+  }
+);
 
-    navigation.replace("Login");
+const { user } = response.data;
+
+console.log('Registered user:', user);
+
+navigation.replace('SuccessAnimationScreen');
 
   } catch (error: any) {
 

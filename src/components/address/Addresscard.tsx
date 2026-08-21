@@ -1,20 +1,17 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import MaterialIcons from "@react-native-vector-icons/material-design-icons";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MaterialIcons from '@react-native-vector-icons/material-design-icons';
+
+type AddressType = 'Home' | 'Office' | 'Other';
 
 interface AddressCardProps {
-  type: "Home" | "Office" | "Other";
+  type: AddressType;
   address: string;
   city: string;
   state: string;
   pincode: string;
   isDefault?: boolean;
-  onPress?: () => void;
+  onPress: () => void;
 }
 
 export default function AddressCard({
@@ -23,140 +20,86 @@ export default function AddressCard({
   city,
   state,
   pincode,
-  isDefault = false,
+  isDefault,
   onPress,
 }: AddressCardProps) {
-  const getIcon = () => {
-    switch (type) {
-      case "Home":
-        return "home";
-      case "Office":
-        return "business";
-      default:
-        return "location-on";
-    }
-  };
+  const icon = type === 'Home' ? 'home-outline' : 'office-building-outline';
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.85}
-      onPress={onPress}
-    >
-      <View style={styles.header}>
-        <View style={styles.leftSection}>
-          <View style={styles.iconContainer}>
-            <MaterialIcons
-              name={getIcon() as any}
-              size={22}
-              color="#1565C0"
-            />
-          </View>
-
-          <View>
-            <Text style={styles.title}>{type}</Text>
-
-            <Text style={styles.address}>
-              {address}
-            </Text>
-
-            <Text style={styles.location}>
-              {city}, {state} - {pincode}
-            </Text>
-          </View>
-        </View>
-
-        {isDefault && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>
-              Default
-            </Text>
-          </View>
-        )}
+    <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={onPress}>
+      <View style={styles.iconBox}>
+        <MaterialIcons name={icon as any} size={24} color="#1565C0" />
       </View>
 
-      <MaterialIcons
-        name="chevron-right"
-        size={24}
-        color="#9CA3AF"
-        style={styles.arrow}
-      />
+      <View style={{ flex: 1, marginLeft: 14 }}>
+        <View style={styles.headerRow}>
+          <Text style={styles.type}>{type}</Text>
+          {isDefault && (
+            <View style={styles.defaultBadge}>
+              <Text style={styles.defaultText}>Default</Text>
+            </View>
+          )}
+        </View>
+
+        <Text style={styles.address}>{address}</Text>
+        {(city || state || pincode) && (
+          <Text style={styles.subText}>
+            {[city, state, pincode].filter(Boolean).join(', ')}
+          </Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     borderRadius: 18,
-    padding: 18,
+    padding: 16,
     marginBottom: 16,
-
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-
-  leftSection: {
-    flexDirection: "row",
-    flex: 1,
-  },
-
-  iconContainer: {
+  iconBox: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: "#E8F2FD",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 14,
+    borderRadius: 14,
+    backgroundColor: '#E8F1FD',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-
-  title: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#1F2937",
-    marginBottom: 6,
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-
+  type: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  defaultBadge: {
+    marginLeft: 8,
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  defaultText: {
+    color: '#166534',
+    fontSize: 11,
+    fontWeight: '700',
+  },
   address: {
-    fontSize: 15,
-    color: "#374151",
-    lineHeight: 22,
-  },
-
-  location: {
     marginTop: 4,
     fontSize: 14,
-    color: "#6B7280",
+    color: '#374151',
   },
-
-  badge: {
-    backgroundColor: "#E8F5E9",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-
-  badgeText: {
-    color: "#2E7D32",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  arrow: {
-    alignSelf: "flex-end",
-    marginTop: 12,
+  subText: {
+    marginTop: 2,
+    fontSize: 13,
+    color: '#6B7280',
   },
 });

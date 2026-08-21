@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import MaterialIcons from "@react-native-vector-icons/material-design-icons";
 import CreditCardPreview from "../../components/payment/CreditCardPreview";
+import { useNavigation } from "@react-navigation/native";
 
 export default function AddCardScreen() {
+  const navigation = useNavigation();
   const [cardNumber, setCardNumber] = useState("");
   const [cardHolder, setCardHolder] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -27,13 +29,13 @@ export default function AddCardScreen() {
         {/* Header */}
 
         <View style={styles.header}>
-          <TouchableOpacity>
-            <MaterialIcons
-              name="arrow-left"
-              size={24}
-              color="#111827"
-            />
-          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <MaterialIcons
+            name="arrow-left"
+            size={24}
+            color="#111827"
+          />
+        </TouchableOpacity>
 
           <Text style={styles.title}>
             Add Card
@@ -45,12 +47,12 @@ export default function AddCardScreen() {
         {/* Card Preview */}
 
         <CreditCardPreview
-    cardNumber={cardNumber}
-    cardHolder={cardHolder}
-    expiry={expiry}
-    cardType="Visa"
-/>
-        {/* Form */}
+            cardNumber={cardNumber}
+            cardHolder={cardHolder}
+            expiry={expiry}
+            cardType="Visa"
+        />
+         {/* Form */}
 
         <Text style={styles.fieldLabel}>
           Card Number
@@ -132,7 +134,9 @@ export default function AddCardScreen() {
 
         {/* Save */}
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>
             Save Card
           </Text>

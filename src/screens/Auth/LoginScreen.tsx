@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Image } from 'react-native';
-import { saveToken } from '../../services/AsyncStorageServices';
+import { saveToken } from '../../services/AsyncStorageService';
+import axios from 'axios';
+import API from '../../services/api';
+import { Alert } from 'react-native';
 import {
   SafeAreaView,
   View,
@@ -28,7 +31,7 @@ const LoginScreen = ({ navigation }: any) => {
 
   
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
   setEmailError('');
   setPasswordError('');
 
@@ -44,14 +47,38 @@ const LoginScreen = ({ navigation }: any) => {
     valid = false;
   }
 
-  if (!valid) {
-    return;
+  if (!valid) return;
+
+  try {
+    const response = await API.post('/auth/login', {
+      email,
+      password,
+    });
+
+    const { token, user } = response.data;
+
+    await saveToken(token);
+
+    console.log('Logged in user:', user);
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'App' }],
+    });
+
+  } catch (error: any) {
+    console.log("LOGIN ERROR:", error);
+
+console.log("STATUS:", error?.response?.status);
+
+console.log("DATA:", error?.response?.data);
+
+Alert.alert(
+  "Login Failed",
+  JSON.stringify(error?.response?.data || error.message)
+);
   }
-
-  // Temporary navigation while backend is not connected
-  navigation.replace('App');
 };
-
 
 
   return (
